@@ -5,6 +5,10 @@ import { UserRepository } from '@/domain/interfaces/user-repository.interface';
 export class UserRepositoryImpl implements UserRepository {
   constructor(private prisma: PrismaClient) {}
 
+  private toEntity(user: any): User {
+    return new User(user.email, user.password, user.name, user.id);
+  }
+
   async create(user: User): Promise<User> {
     const createdUser = await this.prisma.user.create({
       data: {
@@ -13,27 +17,29 @@ export class UserRepositoryImpl implements UserRepository {
         name: user.name,
       },
     });
-    return new User(createdUser.email, createdUser.password, createdUser.name, createdUser.id);
+    return this.toEntity(createdUser);
   }
 
   async findById(id: number): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) return null;
-    return new User(user.email, user.password, user.name, user.id);
+    return user ? this.toEntity(user) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) return null;
-    return new User(user.email, user.password, user.name, user.id);
+    return user ? this.toEntity(user) : null;
   }
 
   async update(id: number, user: Partial<User>): Promise<User> {
     const updatedUser = await this.prisma.user.update({
       where: { id },
-      data: user,
+      data: {
+        ...(user.email && { email: user.email }),
+        ...(user.password && { password: user.password }),
+        ...(user.name && { name: user.name }),
+      },
     });
-    return new User(updatedUser.email, updatedUser.password, updatedUser.name, updatedUser.id);
+    return this.toEntity(updatedUser);
   }
 
   async delete(id: number): Promise<void> {
@@ -42,6 +48,6 @@ export class UserRepositoryImpl implements UserRepository {
 
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany();
-    return users.map(user => new User(user.email, user.password, user.name, user.id));
+    return users.map(this.toEntity);
   }
 }

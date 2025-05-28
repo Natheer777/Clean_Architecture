@@ -14,7 +14,7 @@ export class CreateUserUseCases {
         user.validate();
         const existingUser = await this.userRepository.findByEmail(email)
         if (existingUser) {
-            throw new Error("user already exist");
+            throw new Error("User already exists. Please use a different email.");
         }
         user.password = await this.passwordEncryptor.hash(password)
         return this.userRepository.create(user)

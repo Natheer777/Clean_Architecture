@@ -14,7 +14,7 @@ export class LoginUserUseCase {
     async execute(email: string, password: string, jwtSecret: string): Promise<string> {
         const user = await this.userRepository.findByEmail(email)
         if (!user) {
-            throw new Error("Invalid credentials")
+            throw new Error("Invalid credentials. Please check your username and password.");
         }
         const isPassword = await this.passwordEncryptor.compare(password, user.password);
         if (!isPassword) {
