@@ -4,13 +4,13 @@ import { LoginUserUseCase } from "@/domain/use-cases/Login-user";
 import { JwtTokenGenerate } from "../encryptors/JwtGenerate";
 import { BcryptEncrypt } from "../encryptors/bcrypt";
 import { UserRepositoryImpl } from "../repository/user_repository";
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma"; // Use singleton
 
 export class UserController {
     private creatUserusecases: CreateUserUseCases;
     private loginUserusecases: LoginUserUseCase;
+    
     constructor() {
-        const prisma = new PrismaClient();
         const userRepository = new UserRepositoryImpl(prisma);
         const passwordEncryptor = new BcryptEncrypt();
         const tokenGenerator = new JwtTokenGenerate();
@@ -49,7 +49,7 @@ export class UserController {
     async getById(req: Request, res: Response) {
         try {
             const id = parseInt(req.params.id);
-            const user = await this.creatUserusecases['userRepository'].fidnById(id);
+           const user = await this.creatUserusecases['userRepository'].findById(id);
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
