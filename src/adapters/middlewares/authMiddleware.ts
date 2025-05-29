@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 
-// تعديل رئيسي هنا: لا ترجع Response، فقط نفّذ res.status(...) وأوقف التنفيذ بـ return;
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
@@ -21,7 +20,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
   }
 };
 
-// لتوسيع نوع Request وإضافة الحقل user بشكل رسمي
 declare global {
   namespace Express {
     interface Request {
